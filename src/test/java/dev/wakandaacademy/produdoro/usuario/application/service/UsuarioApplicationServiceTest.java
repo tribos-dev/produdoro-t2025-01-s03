@@ -49,9 +49,23 @@ class UsuarioApplicationServiceTest {
         Usuario usuarioFoco = DataHelper.createUsuarioFoco();
         when(usuarioRepository.buscaUsuarioPorEmail(usuarioFoco.getEmail())).thenReturn(usuarioFoco);
         when(usuarioRepository.buscaUsuarioPorId(usuarioFoco.getIdUsuario())).thenReturn(usuarioFoco);
-        APIException exception = assertThrows(APIException.class,()-> usuarioApplicationService.mudaStatusParaFoco(usuarioFoco.getEmail(),usuarioFoco.getIdUsuario()));
+        APIException exception = assertThrows(APIException.class,
+                ()-> usuarioApplicationService.mudaStatusParaFoco(usuarioFoco.getEmail(),usuarioFoco.getIdUsuario()));
         assertEquals("Usuário ja esta em FOCO!", exception.getMessage());
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusException());
         verify(usuarioRepository, times(1)).buscaUsuarioPorEmail(usuarioFoco.getEmail());
+    }
+
+    @Test
+    void alteraStatusParaFocoUsuarioNaoEncontrado(){
+       UUID idUsuarioNaoEncontrado = UUID.randomUUID();
+       when(usuarioRepository.buscaUsuarioPorId(idUsuarioNaoEncontrado))
+               .thenThrow(APIException.build(HttpStatus.BAD_REQUEST, "Usuário não encontrado!"));
+        APIException exception = assertThrows(APIException.class,
+                ()-> usuarioApplicationService.mudaStatusParaFoco(usuarioEmail,idUsuarioNaoEncontrado));
+
+        assertEquals("Usuário não encontrado!", exception.getMessage());
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusException());
+        verify(usuarioRepository, times(1)).buscaUsuarioPorId(idUsuarioNaoEncontrado);
     }
 }

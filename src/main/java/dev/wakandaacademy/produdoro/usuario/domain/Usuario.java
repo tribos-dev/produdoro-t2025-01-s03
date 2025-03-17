@@ -6,6 +6,7 @@ import javax.validation.constraints.Email;
 
 import dev.wakandaacademy.produdoro.handler.APIException;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -49,7 +50,7 @@ public class Usuario {
 		verificaStatusFoco();
     }
 
-	private void validaUsuarioPorId(UUID idUsuario) {
+	public void validaUsuarioPorId(UUID idUsuario) {
 		if (this.idUsuario.equals(idUsuario)){
 			throw APIException.build(HttpStatus.UNAUTHORIZED, "Credencial de autenticação não é válida!");
 		}
@@ -62,7 +63,8 @@ public class Usuario {
 		mudaStatusParaFoco();
 	}
 
-	private void mudaStatusParaFoco() {
+	public void mudaStatusParaFoco() {
 		this.status = StatusUsuario.FOCO;
 	}
+
 }

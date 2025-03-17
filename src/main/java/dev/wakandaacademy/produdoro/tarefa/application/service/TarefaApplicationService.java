@@ -49,18 +49,19 @@ public class TarefaApplicationService implements TarefaService {
                 () -> APIException.build(HttpStatus.NOT_FOUND, "Id da tarefa inválido."));
 
         Usuario usuario = usuarioRepository.buscaUsuarioPorEmail(emailUsuario);
-
         tarefa.pertenceAoUsuario(usuario);
-
         tarefa.verificaAtivacao();
-
-        List<Tarefa> listaTarefa = tarefaRepository.buscaPorIdUsuario(usuario.getIdUsuario());
-
-        listaTarefa.forEach(Tarefa::inativaTarefa);
+        desativaTodasTarefasDoUsuario(usuario);
         tarefa.ativaTarefa();
-        listaTarefa.forEach(tarefaRepository::salva);
         tarefaRepository.salva(tarefa);
 
         log.info("[end] TarefaApplicationService - ativaTarefa");
+    }
+    private void desativaTodasTarefasDoUsuario(Usuario usuario) {
+        log.info("[start] TarefaApplicationService - desativaTodasTarefasDoUsuario");
+        List<Tarefa> listaTarefa = tarefaRepository.buscaPorIdUsuario(usuario.getIdUsuario());
+        listaTarefa.forEach(Tarefa::inativaTarefa);
+        listaTarefa.forEach(tarefaRepository::salva);
+        log.info("[end] TarefaApplicationService - desativaTodasTarefasDoUsuario");
     }
 }

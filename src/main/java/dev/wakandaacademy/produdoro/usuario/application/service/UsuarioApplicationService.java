@@ -43,10 +43,4 @@ public class UsuarioApplicationService implements UsuarioService {
 		return new UsuarioCriadoResponse(usuario);
 	}
 
-	@Override
-	public void mudaStatusPausaLonga(String usuarioEmail, UUID idUsuario) {
-
-	}
-
-
 }

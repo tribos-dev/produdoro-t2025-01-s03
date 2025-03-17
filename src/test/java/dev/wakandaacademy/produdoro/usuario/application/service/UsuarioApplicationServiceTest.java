@@ -46,13 +46,12 @@ class UsuarioApplicationServiceTest {
 
     @Test
     void alteraStatusParaFocoEUsuarioJaEstaEmFoco() {
-        Usuario usuario = DataHelper.createUsuario();
-        when(usuarioRepository.buscaUsuarioPorEmail(usuario.getEmail())).thenReturn(usuario);
-        when(usuarioRepository.buscaUsuarioPorId(usuario.getIdUsuario())).thenReturn(usuario);
-        usuarioApplicationService.mudaStatusParaFoco(usuario.getEmail(), usuario.getIdUsuario());
-        APIException exception = assertThrows(APIException.class,()-> usuarioApplicationService.mudaStatusParaFoco(usuario.getEmail(),usuario.getIdUsuario()));
+        Usuario usuarioFoco = DataHelper.createUsuarioFoco();
+        when(usuarioRepository.buscaUsuarioPorEmail(usuarioFoco.getEmail())).thenReturn(usuarioFoco);
+        when(usuarioRepository.buscaUsuarioPorId(usuarioFoco.getIdUsuario())).thenReturn(usuarioFoco);
+        APIException exception = assertThrows(APIException.class,()-> usuarioApplicationService.mudaStatusParaFoco(usuarioFoco.getEmail(),usuarioFoco.getIdUsuario()));
         assertEquals("Usuário ja esta em FOCO!", exception.getMessage());
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusException());
-        verify(usuarioRepository, times(1)).buscaUsuarioPorEmail(usuario.getEmail());
+        verify(usuarioRepository, times(1)).buscaUsuarioPorEmail(usuarioFoco.getEmail());
     }
 }

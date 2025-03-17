@@ -42,7 +42,7 @@ public class UsuarioController implements UsuarioAPI {
 	@Override
 	public void mudaStatusParaFoco(String token, UUID idUsuario) {
 		log.info("[inicia] UsuarioController - alteraStatusParaFoco");
-		String usuario = validaTokenUsuario(token); // Validação do token é feita aqui
+		String usuario = validaTokenUsuario(token); 
 		usuarioAppplicationService.mudaStatusParaFoco(usuario, idUsuario);
 		log.info("[finaliza] UsuarioController - alteraStatusParaFoco");
 	}

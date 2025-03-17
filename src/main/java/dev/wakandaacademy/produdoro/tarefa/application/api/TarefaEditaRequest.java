@@ -15,4 +15,8 @@ public class TarefaEditaRequest {
     @NotEmpty(message = "O campo não pode estar vazio")
     private String descricao;
 
+    public TarefaEditaRequest(UUID idTarefa, String novaDescriçãoDaTarefa) {
+        this.id = idTarefa;
+        this.descricao = novaDescriçãoDaTarefa;
+    }
 }

@@ -53,60 +53,11 @@ class TarefaApplicationServiceTest {
         assertEquals(UUID.class, response.getIdTarefa().getClass());
     }
 
-//    @Test
-//    void deveAtivarTarefa() {
-//        Tarefa tarefa = DataHelper.createTarefa();
-//        UUID idtarefa = tarefa.getIdTarefa();
-//        Usuario usuario = DataHelper.createUsuario();
-//        String email = usuario.getEmail();
-//
-//
-//        when(usuarioRepository.buscaUsuarioPorEmail(email)).thenReturn(usuario);
-//        when(tarefaRepository.buscaTarefaPorId(idtarefa)).thenReturn(Optional.of(tarefa));
-//
-//
-//        tarefaApplicationService.ativaTarefa(idtarefa, email);
-//
-//
-//        assertEquals(StatusAtivacaoTarefa.ATIVA, tarefa.getStatusAtivacao());
-//
-//
-//        verify(tarefaRepository, times(1)).buscaTarefaPorId(idtarefa);
-//        verify(tarefaRepository, times(1)).salva(tarefa);
-//    }
-
-    @Test
-    void deveEditarTarefa() {
-        // Usando o DataHelper para criar as instâncias dentro do método
-        Usuario usuario = DataHelper.createUsuario();
-        Tarefa tarefa = DataHelper.createTarefa();
-        String emailUsuario = usuario.getEmail();
-        UUID idTarefa = tarefa.getIdTarefa();
-        TarefaEditaRequest tarefaEditaRequest = new TarefaEditaRequest(
-                tarefa.getIdTarefa(), "Nova descrição da tarefa");
-
-        // Mockando comportamento dos repositórios
-//        when(usuarioRepository.buscaUsuarioPorEmail(emailUsuario)).thenReturn(usuario);
-//        when(tarefaRepository.buscaTarefaPorId(idTarefa)).thenReturn(Optional.of(tarefa));
-
-//        // Cenário 1: Tarefa editada com sucesso
-        tarefaApplicationService.editaTarefa(tarefaEditaRequest, usuario.getEmail());
-
-        verify(tarefaRepository, times(1)).salva(tarefa);
-        assertEquals("Nova descrição da tarefa", tarefa.getDescricao());
-
-//        // Cenário 2: Tarefa não encontrada
-//        when(tarefaRepository.buscaTarefaPorId(idTarefa)).thenReturn(Optional.empty());
-//        APIException exception = assertThrows(APIException.class, () -> {
-//            tarefaApplicationService.editaTarefa(tarefaEditaRequest, usuario.getEmail());
-//        });
-//        assertEquals("Tarefa não encontrada!", exception.getMessage());
-    }
-
     @Test
     void deveRetornarTarefaAlterada() {
         Usuario usuario = DataHelper.createUsuario();
         Tarefa tarefa = DataHelper.createTarefa();
+
         TarefaEditaRequest tarefaEditaRequest = new TarefaEditaRequest(
                 tarefa.getIdTarefa(), "Nova descrição da tarefa");
 

@@ -59,7 +59,7 @@ public class Usuario {
         log.info("[inicia] usuario - validaSeUsuarioJaEstarEmPausaLonga");
         if (this.status.equals(StatusUsuario.PAUSA_LONGA)){
             log.info("[finaliza] APIExeception - validaSeUsuarioJaEstarEmPausaLonga");
-            throw APIException.build(HttpStatus.BAD_REQUEST, "Usuario ja eata em PAUSA LONGA");
+            throw APIException.build(HttpStatus.CONFLICT, "Usuario ja eata em PAUSA LONGA");
         }
         log.info("[finaliza] usuario - validaSeUsuarioJaEstarEmPausaLonga");
 
@@ -67,7 +67,7 @@ public class Usuario {
 
     private void validaUsuario(UUID idUsuario) {
         log.info("[inicia] usuario - validaUsuario");
-        if (this.idUsuario.equals(idUsuario)){
+        if (!this.idUsuario.equals(idUsuario)){
             log.info("[finaliza] APIExeception - validaUsuario");
             throw  APIException.build(HttpStatus.UNAUTHORIZED, "credencial de autenticação não é válida.");
         }

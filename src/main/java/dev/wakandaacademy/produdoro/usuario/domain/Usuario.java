@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import javax.validation.constraints.Email;
 
+import dev.wakandaacademy.produdoro.handler.APIException;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,6 +17,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.http.HttpStatus;
 
 @Builder
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -40,5 +42,23 @@ public class Usuario {
 		this.email = usuarioNovo.getEmail();
 		this.status = StatusUsuario.FOCO;
 		this.configuracao = new ConfiguracaoUsuario(configuracaoPadrao);
+	}
+
+	public void mudaStatusParaPausaCurta(UUID idUsuario) {
+		validaUsuaro(idUsuario);
+		verificaSeJaEstaEmPausaCurta();
+		this.status = StatusUsuario.PAUSA_CURTA;
+	}
+
+	private void verificaSeJaEstaEmPausaCurta() {
+		if (this.status.equals(StatusUsuario.PAUSA_CURTA)){
+			throw APIException.build(HttpStatus.UNAUTHORIZED, "Usuario já esta em PAUSA CURTA.");
+		}
+	}
+
+	private void validaUsuaro(UUID idUsuario) {
+		if (!this.idUsuario.equals(idUsuario)){
+			throw APIException.build(HttpStatus.UNAUTHORIZED, "O ID do usuário não corresponde às credenciais fornecidas.");
+		}
 	}
 }

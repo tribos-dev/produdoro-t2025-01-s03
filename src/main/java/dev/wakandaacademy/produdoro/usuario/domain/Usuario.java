@@ -42,4 +42,8 @@ public class Usuario {
 		this.configuracao = new ConfiguracaoUsuario(configuracaoPadrao);
 	}
 
+	public void alterarStatusParaFoco(StatusUsuario novoStatus) {
+		this.status = StatusUsuario.FOCO;
+
+	}
 }

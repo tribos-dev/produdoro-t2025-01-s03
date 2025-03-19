@@ -60,10 +60,16 @@ public class Tarefa {
 	}
 
 	public void incrementaPomodoro(Tarefa tarefa, Usuario usuario) {
-		if (!Objects.equals(usuario.getStatus(), StatusUsuario.FOCO));
+		if (!Objects.equals(usuario.getStatus(), StatusUsuario.FOCO)) {
+		}
+		this.ativaTarefa();
 		this.incrementaPomodoro();
 		StatusUsuario novoStatus = this.alteraStatusPorCadaPomodoro(this.contagemPomodoro);
-		//usuario.alterarStatus(novoStatus);
+		usuario.alterarStatusParaFoco(novoStatus);
+	}
+
+	private void ativaTarefa() {
+		this.statusAtivacao = StatusAtivacaoTarefa.ATIVA;
 	}
 
 	private void incrementaPomodoro() {

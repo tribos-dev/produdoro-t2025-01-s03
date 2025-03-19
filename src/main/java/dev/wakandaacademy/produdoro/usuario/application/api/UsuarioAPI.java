@@ -24,5 +24,4 @@ public interface UsuarioAPI {
 	void mudaStatusParaPausaLonga(@RequestHeader(name = "Authorization",
 			required = true)String token,@PathVariable UUID idUsuario);
 
-
 }

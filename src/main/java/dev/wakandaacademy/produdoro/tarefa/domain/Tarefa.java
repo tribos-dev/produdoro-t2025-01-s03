@@ -69,4 +69,8 @@ public class Tarefa {
 			throw APIException.build(HttpStatus.CONFLICT, "Tarefa já está ativa!");
 		}
 	}
+
+	public void editaDescricao(String descricao) {
+		this.descricao = descricao;
+	}
 }

@@ -55,4 +55,18 @@ public class Tarefa {
 			throw APIException.build(HttpStatus.UNAUTHORIZED, "Usuário não é dono da Tarefa solicitada!");
 		}
 	}
+
+	public void ativaTarefa(){
+		this.statusAtivacao = StatusAtivacaoTarefa.ATIVA;
+	}
+
+	public void inativaTarefa(){
+		this.statusAtivacao = StatusAtivacaoTarefa.INATIVA;
+	}
+
+	public void verificaAtivacao(){
+		if(this.statusAtivacao.equals(StatusAtivacaoTarefa.ATIVA)) {
+			throw APIException.build(HttpStatus.CONFLICT, "Tarefa já está ativa!");
+		}
+	}
 }

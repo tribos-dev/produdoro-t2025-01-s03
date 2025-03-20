@@ -1,24 +1,17 @@
 package dev.wakandaacademy.produdoro.usuario.domain;
 
-import java.util.UUID;
-
-import javax.validation.constraints.Email;
-
 import dev.wakandaacademy.produdoro.handler.APIException;
+import dev.wakandaacademy.produdoro.pomodoro.domain.ConfiguracaoPadrao;
+import dev.wakandaacademy.produdoro.usuario.application.api.UsuarioNovoRequest;
+import lombok.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import dev.wakandaacademy.produdoro.pomodoro.domain.ConfiguracaoPadrao;
-import dev.wakandaacademy.produdoro.usuario.application.api.UsuarioNovoRequest;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.springframework.http.HttpStatus;
+
+import javax.validation.constraints.Email;
+import java.util.UUID;
 
 @Builder
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -46,8 +39,26 @@ public class Usuario {
         this.configuracao = new ConfiguracaoUsuario(configuracaoPadrao);
     }
 
+    public void mudaStatusParaPausaCurta(UUID idUsuario) {
+        validaUsuaro(idUsuario);
+        verificaSeJaEstaEmPausaCurta();
+        this.status = StatusUsuario.PAUSA_CURTA;
+    }
+
+    private void verificaSeJaEstaEmPausaCurta() {
+        if (this.status.equals(StatusUsuario.PAUSA_CURTA)) {
+            throw APIException.build(HttpStatus.UNAUTHORIZED, "Usuario já esta em PAUSA CURTA.");
+        }
+    }
+
+    private void validaUsuaro(UUID idUsuario) {
+        if (!this.idUsuario.equals(idUsuario)) {
+            throw APIException.build(HttpStatus.UNAUTHORIZED, "O ID do usuário não corresponde às credenciais fornecidas.");
+        }
+    }
+
     public void mudaStatusParaPausaLonga(UUID idUsuario) {
-		log.info("[inicia] usuario - mudaStatusParaPausaLonga");
+        log.info("[inicia] usuario - mudaStatusParaPausaLonga");
         validaUsuario(idUsuario);
         validaSeUsuarioJaEstarEmPausaLonga();
         this.status = StatusUsuario.PAUSA_LONGA;
@@ -57,7 +68,7 @@ public class Usuario {
 
     private void validaSeUsuarioJaEstarEmPausaLonga() {
         log.info("[inicia] usuario - validaSeUsuarioJaEstarEmPausaLonga");
-        if (this.status.equals(StatusUsuario.PAUSA_LONGA)){
+        if (this.status.equals(StatusUsuario.PAUSA_LONGA)) {
             log.info("[finaliza] APIExeception - validaSeUsuarioJaEstarEmPausaLonga");
             throw APIException.build(HttpStatus.CONFLICT, "Usuario ja eata em PAUSA LONGA");
         }
@@ -67,9 +78,9 @@ public class Usuario {
 
     private void validaUsuario(UUID idUsuario) {
         log.info("[inicia] usuario - validaUsuario");
-        if (!this.idUsuario.equals(idUsuario)){
+        if (!this.idUsuario.equals(idUsuario)) {
             log.info("[finaliza] APIExeception - validaUsuario");
-            throw  APIException.build(HttpStatus.UNAUTHORIZED, "credencial de autenticação não é válida.");
+            throw APIException.build(HttpStatus.UNAUTHORIZED, "credencial de autenticação não é válida.");
         }
         log.info("[finaliza] usuario - validaUsuario");
     }

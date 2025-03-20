@@ -1,17 +1,15 @@
 package dev.wakandaacademy.produdoro.usuario.application.api;
 
-import javax.validation.Valid;
-
 import dev.wakandaacademy.produdoro.config.security.service.TokenService;
 import dev.wakandaacademy.produdoro.handler.APIException;
+import dev.wakandaacademy.produdoro.usuario.application.service.UsuarioService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 
-import dev.wakandaacademy.produdoro.usuario.application.service.UsuarioService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-
+import javax.validation.Valid;
 import java.util.UUID;
 
 @RestController
@@ -19,6 +17,7 @@ import java.util.UUID;
 @Log4j2
 @RequiredArgsConstructor
 public class UsuarioController implements UsuarioAPI {
+
     private final UsuarioService usuarioAppplicationService;
     private final TokenService tokenService;
 
@@ -38,21 +37,35 @@ public class UsuarioController implements UsuarioAPI {
         log.info("[finaliza] UsuarioController - buscaUsuarioPorId");
         return buscaUsuario;
     }
+
+    @Override
+    public void mudaStatusParaPausaCurta(String token, UUID idUsuario) {
+        log.info("[start] UsuarioController - mudaStatusParaPausaCurta");
+        String email = validaTokenUsuario(token);
+        usuarioAppplicationService.mudaStatusParaPausaCurta(email, idUsuario);
+        log.info("[finish] UsuarioController - mudaStatusParaPausaCurta");
+    }
+
+    private String validaTokenUsuario(String token) {
+        return tokenService.getUsuarioByBearerToken(token)
+                .orElseThrow(() -> APIException.build(HttpStatus.UNAUTHORIZED, "Credencial de autenticação não é válida"));
+    }
+
     @Override
     public void mudaStatusParaPausaLonga(String token, UUID idUsuario) {
         log.info("[inicia] UsuarioController - mudaStatusParaPausaLonga");
         String usuarioEmail = tokenService.getUsuarioByBearerToken(token)
                 .orElseThrow(() -> APIException.build(HttpStatus.UNAUTHORIZED, token));
-        usuarioAppplicationService.mudaStatusPausaLonga(usuarioEmail,idUsuario);
+        usuarioAppplicationService.mudaStatusPausaLonga(usuarioEmail, idUsuario);
         log.info("[finaliza] UsuarioController - mudaStatusParaPausaLonga");
 
     }
 
     private String getUsuarioByToken(String token) {
-        log.info("[token] {}",token);
+        log.info("[token] {}", token);
         String usuario = tokenService.getUsuarioByBearerToken(token).
-                orElseThrow(( )-> APIException.build(HttpStatus.UNAUTHORIZED,token));
-        log.info("[usuario] {}",usuario);
+                orElseThrow(() -> APIException.build(HttpStatus.UNAUTHORIZED, token));
+        log.info("[usuario] {}", usuario);
         return usuario;
     }
 }

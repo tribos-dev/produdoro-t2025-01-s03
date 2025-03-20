@@ -53,4 +53,8 @@ public class DataHelper {
 
         );
     }
+
+    public static Usuario createUsuario1() {
+        return Usuario.builder().email("email@email.com").status(StatusUsuario.FOCO).idUsuario(usuario1).build();
+    }
 }

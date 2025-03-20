@@ -20,7 +20,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UsuarioApplicationServiceTest {
-
     @InjectMocks
     UsuarioApplicationService usuarioApplicationService;
 
@@ -60,5 +59,15 @@ class UsuarioApplicationServiceTest {
         });
 
         assertEquals("O ID do usuário não corresponde às credenciais fornecidas.", exception.getMessage());
+    }
+
+    @Test
+    void deveMudarParaPausaLonga() {
+        Usuario usuario = DataHelper.createUsuario1();
+        when(usuarioRepository.buscaUsuarioPorEmail(anyString())).thenReturn(usuario);
+        when(usuarioRepository.buscaUsuarioPorId(any())).thenReturn(usuario);
+        usuarioApplicationService.mudaStatusPausaLonga(usuario.getEmail(), usuario.getIdUsuario());
+        assertEquals(StatusUsuario.PAUSA_LONGA, usuario.getStatus());
+        verify(usuarioRepository, times(1)).salva(usuario);
     }
 }

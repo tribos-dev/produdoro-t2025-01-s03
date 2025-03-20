@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import dev.wakandaacademy.produdoro.DataHelper;
+import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaListResponse;
+import dev.wakandaacademy.produdoro.usuario.application.repository.UsuarioRepository;
+import dev.wakandaacademy.produdoro.usuario.domain.Usuario;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,6 +36,9 @@ class TarefaApplicationServiceTest {
     @Mock
     TarefaRepository tarefaRepository;
 
+    @Mock
+    UsuarioRepository usuarioRepository;
+
     @Test
     void deveRetornarIdTarefaNovaCriada() {
         TarefaRequest request = getTarefaRequest();
@@ -50,4 +57,21 @@ class TarefaApplicationServiceTest {
         TarefaRequest request = new TarefaRequest("tarefa 1", UUID.randomUUID(), null, null, 0);
         return request;
     }
+
+    @Test
+   void deveListarTarefasPorUsuario() {
+        Usuario usuarioEncontrado = DataHelper.createUsuario();
+        List<Tarefa> listaTarefas = DataHelper.createListTarefa();
+        when(usuarioRepository.buscaUsuarioPorId(any())).thenReturn(usuarioEncontrado);
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuarioEncontrado);
+        when(tarefaRepository.buscaTarefasDoUsuario(any())).thenReturn(listaTarefas);
+        String usuario = "Email@email.com";
+        UUID idUsuario = UUID.fromString("a713162f-20a9-4db9-a85b-90cd51ab18f4");
+        List<TarefaListResponse> response = tarefaApplicationService.buscaTodasTarefas(usuario, idUsuario);
+        assertNotNull(response);
+        assertEquals(ArrayList.class, response.getClass());
+        assertEquals(8, response.size());
+    }
+
+
 }

@@ -46,6 +46,8 @@ public class TarefaRestController implements TarefaAPI {
     @Override
     public void atualizaOrdemTarefa(String token, UUID idTarefa, NovaOrdemRequest novaOrdem) {
         log.info("[start] TarefaRestController - atualizaOrdemTarefa");
+        String emailUsuario = getUsuarioByToken(token);
+        tarefaService.atualizaOrdemTarefa(emailUsuario, idTarefa, novaOrdem);
         log.debug("[finish] TarefaRestController - atualizaOrdemTarefa");
     }
 
@@ -55,6 +57,4 @@ public class TarefaRestController implements TarefaAPI {
         log.info("[usuario] {}", usuario);
         return usuario;
     }
-
-
 }

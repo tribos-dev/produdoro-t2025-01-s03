@@ -84,4 +84,8 @@ public class Usuario {
         }
         log.info("[finaliza] usuario - validaUsuario");
     }
+
+    public void alterarStatusParaFoco(StatusUsuario novoStatus) {
+
+    }
 }

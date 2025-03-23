@@ -14,6 +14,7 @@ import dev.wakandaacademy.produdoro.usuario.domain.Usuario;
 public class DataHelper {
 
     private static final UUID usuario1 = UUID.fromString("a713162f-20a9-4db9-a85b-90cd51ab18f4");
+    private static final UUID usuario2 = UUID.fromString("a713162f-20a9-4db9-a85b-90cd51ab18a1");
 
     public static Usuario createUsuario() {
         return Usuario.builder().email("email@email.com").status(StatusUsuario.PAUSA_LONGA).idUsuario(usuario1).build();
@@ -57,5 +58,11 @@ public class DataHelper {
         );
     }
 
+    public static Usuario createUsuario1() {
+        return Usuario.builder().email("email@email.com").status(StatusUsuario.FOCO).idUsuario(usuario1).build();
+    }
 
+    public static Usuario createUsuario2() {
+        return Usuario.builder().email("email@email.com").status(StatusUsuario.FOCO).idUsuario(usuario2).build();
+    }
 }

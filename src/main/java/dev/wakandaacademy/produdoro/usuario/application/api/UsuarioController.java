@@ -21,6 +21,7 @@ public class UsuarioController implements UsuarioAPI {
     private final UsuarioService usuarioAppplicationService;
     private final TokenService tokenService;
 
+
     @Override
     public UsuarioCriadoResponse postNovoUsuario(@Valid UsuarioNovoRequest usuarioNovo) {
         log.info("[inicia] UsuarioController - postNovoUsuario");
@@ -68,4 +69,12 @@ public class UsuarioController implements UsuarioAPI {
         log.info("[usuario] {}", usuario);
         return usuario;
     }
+
+	@Override
+	public void mudaStatusParaFoco(String token, UUID idUsuario) {
+		log.info("[inicia] UsuarioController - alteraStatusParaFoco");
+		String usuario = validaTokenUsuario(token);
+		usuarioAppplicationService.mudaStatusParaFoco(usuario, idUsuario);
+		log.info("[finaliza] UsuarioController - alteraStatusParaFoco");
+	}
 }

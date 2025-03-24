@@ -84,4 +84,27 @@ public class Usuario {
         }
         log.info("[finaliza] usuario - validaUsuario");
     }
+
+    public void alteraStatusParaFoco(UUID idUsuario) {
+		validaUsuarioPorId(idUsuario);
+		verificaStatusFoco();
+    }
+
+	public void validaUsuarioPorId(UUID idUsuario) {
+		if (!this.idUsuario.equals(idUsuario)){
+			throw APIException.build(HttpStatus.UNAUTHORIZED, "Credencial de autenticação não é válida!");
+		}
+	}
+
+	private void verificaStatusFoco() {
+		if (this.status.equals(StatusUsuario.FOCO)){
+			throw APIException.build(HttpStatus.BAD_REQUEST, "Usuário ja esta em FOCO!");
+		}
+		mudaStatusParaFoco();
+	}
+
+	public void mudaStatusParaFoco() {
+		this.status = StatusUsuario.FOCO;
+	}
+
 }

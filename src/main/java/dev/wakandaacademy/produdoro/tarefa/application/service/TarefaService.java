@@ -9,4 +9,5 @@ public interface TarefaService {
     TarefaIdResponse criaNovaTarefa(TarefaRequest tarefaRequest);
     Tarefa detalhaTarefa(String usuario, UUID idTarefa);
     void incrementaPomodoro(String emailUsuario, UUID idTarefa);
+    void deletaTodasTarefas(String usuario, UUID idUsuario);
 }

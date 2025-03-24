@@ -84,4 +84,10 @@ public class Usuario {
         }
         log.info("[finaliza] usuario - validaUsuario");
     }
+
+    public void pertenceAoUsuario(Usuario usuarioEmail) {
+        if (!this.idUsuario.equals(usuarioEmail.getIdUsuario())) {
+            throw APIException.build(HttpStatus.UNAUTHORIZED, "Usuário(a) não autorizado(a) para a requisição solicitada");
+        }
+    }
 }

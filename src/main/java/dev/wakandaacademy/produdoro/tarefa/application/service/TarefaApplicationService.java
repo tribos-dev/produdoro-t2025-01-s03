@@ -12,6 +12,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -65,7 +66,7 @@ public class TarefaApplicationService implements TarefaService {
         if (tarefas.isEmpty()) {
             throw APIException.build(HttpStatus.CONFLICT, "Usuário não possui tarefa(as) cadastrada(as)");
         }
-        tarefaRepository.deletaTodasTarefasUsuario(Tarefa);
+        tarefaRepository.deletaTodasTarefasUsuario(tarefas);
         log.info("[finaliza] TarefaApplicationService - deletaTodasTarefas");
     }
 

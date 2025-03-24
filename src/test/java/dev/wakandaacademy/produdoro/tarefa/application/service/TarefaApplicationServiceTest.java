@@ -106,4 +106,73 @@ class TarefaApplicationServiceTest {
         TarefaRequest request = new TarefaRequest("tarefa 1", UUID.randomUUID(), null, null, 0);
         return request;
     }
+
+    @Test
+    void deveExcluirTodasAsTarefasDoUsuarioLogado() {
+        Usuario usuario = DataHelper.createUsuario();
+        List<Tarefa> tarefas = DataHelper.createListTarefa();
+
+        when(usuarioRepository.buscaUsuarioPorId(any())).thenReturn(usuario);
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefasDoUsuario(usuario.getIdUsuario())).thenReturn(tarefas);
+        tarefaApplicationService.deletaTodasTarefas(usuario.getEmail(), usuario.getIdUsuario());
+        verify(tarefaRepository, times(1)).deletaTodasTarefasUsuario(tarefas);
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoUsuarioNaoExisteExcluirTarefas() {
+        UUID usuarioInexistente = UUID.randomUUID();
+
+        when(usuarioRepository.buscaUsuarioPorId(usuarioInexistente))
+                .thenThrow((APIException.build(HttpStatus.BAD_REQUEST, "Usuario não encontrado!")));
+
+        APIException exception = assertThrows(APIException.class, () -> {
+            tarefaApplicationService.deletaTodasTarefas("email@exemplo.com", usuarioInexistente);
+        });
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusException());
+        assertEquals("Usuario não encontrado!", exception.getMessage());
+
+        verify(usuarioRepository, times(1)).buscaUsuarioPorId(usuarioInexistente);
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoUsuarioTentarExcluirTarefaNaoLogado() {
+        Usuario usuarioNaoLogado = DataHelper.createUsuario();
+
+        when(tokenService.getUsuarioByBearerToken("email@exemplo.com"))
+                .thenThrow((APIException.build(HttpStatus.UNAUTHORIZED,
+                        "Usuário(a) não autorizado(a) para a requisição solicitada")));
+
+        APIException exception = assertThrows(APIException.class, () -> {
+            tokenService.getUsuarioByBearerToken("email@exemplo.com");
+        });
+
+        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatusException());
+        assertEquals("Usuário(a) não autorizado(a) para a requisição solicitada",
+                exception.getMessage());
+
+        verify(usuarioRepository,
+                times(0)).buscaUsuarioPorId(usuarioNaoLogado.getIdUsuario());
+
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoUsuarioTentarExcluirTarefaInexistente() {
+        Usuario usuario = DataHelper.createUsuario();
+        List<Tarefa> tarefas = Collections.emptyList();
+
+        when(usuarioRepository.buscaUsuarioPorId(any())).thenReturn(usuario);
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefasDoUsuario(usuario.getIdUsuario())).thenReturn(tarefas);
+
+        APIException exception = assertThrows(APIException.class, () -> {
+            tarefaApplicationService.deletaTodasTarefas(usuario.getEmail(), usuario.getIdUsuario());
+        });
+
+        assertEquals(HttpStatus.CONFLICT, exception.getStatusException());
+        assertEquals("Usuário não possui tarefa(as) cadastrada(as)", exception.getMessage());
+    }
+}
+
 }

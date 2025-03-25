@@ -77,7 +77,7 @@ public class Usuario {
 
     }
 
-    private void validaUsuario(UUID idUsuario) {
+    public void validaUsuario(UUID idUsuario) {
         log.info("[inicia] usuario - validaUsuario");
         if (!this.idUsuario.equals(idUsuario)) {
             log.info("[finaliza] APIExeception - validaUsuario");

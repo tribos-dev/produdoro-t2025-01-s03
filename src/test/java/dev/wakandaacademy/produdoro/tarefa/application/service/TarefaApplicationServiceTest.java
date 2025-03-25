@@ -49,10 +49,6 @@ class TarefaApplicationServiceTest {
     UsuarioRepository usuarioRepository;
 
 
-
-    @Mock
-    UsuarioRepository usuarioRepository;
-
     @Test
     void deveRetornarIdTarefaNovaCriada() {
         TarefaRequest request = getTarefaRequest();

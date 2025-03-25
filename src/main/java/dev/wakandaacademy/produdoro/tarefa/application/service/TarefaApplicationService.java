@@ -62,7 +62,7 @@ public class TarefaApplicationService implements TarefaService {
         log.info("[Email] {}", usuarioEmail);
         Usuario usuarioId = usuarioRepository.buscaUsuarioPorId(idUsuario);
         usuarioId.pertenceAoUsuario(usuarioEmail);
-        List<Tarefa> tarefas = tarefaRepository.buscaTarefasDoUsuario(usuarioId.getIdUsuario());
+        List<Tarefa> tarefas = tarefaRepository.buscaTodasTarefasDoUsuario(usuarioId.getIdUsuario());
         if (tarefas.isEmpty()) {
             throw APIException.build(HttpStatus.CONFLICT, "Usuário não possui tarefa(as) cadastrada(as)");
         }

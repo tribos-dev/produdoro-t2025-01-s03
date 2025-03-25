@@ -41,19 +41,6 @@ public class Tarefa {
     private StatusTarefa status;
     private StatusAtivacaoTarefa statusAtivacao;
     private int contagemPomodoro;
-	@Id
-	private UUID idTarefa;
-	@NotBlank
-	private String descricao;
-	@Indexed
-	private UUID idUsuario;
-	@Indexed
-	private UUID idArea;
-	@Indexed
-	private UUID idProjeto;
-	private StatusTarefa status;
-	private StatusAtivacaoTarefa statusAtivacao;
-	private int contagemPomodoro;
 	private int posicaoTarefa;
 
     public Tarefa(TarefaRequest tarefaRequest) {

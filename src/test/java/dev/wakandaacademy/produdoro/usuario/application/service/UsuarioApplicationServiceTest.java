@@ -44,14 +44,6 @@ class UsuarioApplicationServiceTest {
     private final String usuarioEmail = "admin@admin.com";
     private final UUID idUsuario = UUID.randomUUID();
 
-    @BeforeEach
-    void setup() {
-        MockitoAnnotations.openMocks(this);
-
-        usuarioMock = mock(Usuario.class);
-        when(usuarioRepository.buscaUsuarioPorEmail(usuarioEmail)).thenReturn(usuarioMock);
-        when(usuarioRepository.buscaUsuarioPorId(idUsuario)).thenReturn(usuarioMock);
-    }
 
     @DisplayName("Deve mudar o status para pausa curta com sucesso")
     @Test
@@ -102,11 +94,12 @@ class UsuarioApplicationServiceTest {
 
     @Test
     void DeveAlterarStatusParaFoco() {
-        doNothing().when(usuarioMock).validaUsuarioPorId(idUsuario);
-        usuarioApplicationService.mudaStatusParaFoco(usuarioEmail, idUsuario);
-        verify(usuarioRepository).buscaUsuarioPorEmail(usuarioEmail);
-        verify(usuarioMock).alteraStatusParaFoco(idUsuario);
-        verify(usuarioRepository).salva(usuarioMock);
+        Usuario usuario = DataHelper.createUsuario();
+        when(usuarioRepository.buscaUsuarioPorEmail(usuario.getEmail())).thenReturn(usuario);
+        when(usuarioRepository.buscaUsuarioPorId(usuario.getIdUsuario())).thenReturn(usuario);
+        usuarioApplicationService.mudaStatusParaFoco(usuario.getEmail(), usuario.getIdUsuario());
+        verify(usuarioRepository,times(1)).buscaUsuarioPorEmail(usuario.getEmail());
+        verify(usuarioRepository,times(1)).salva(usuario);
     }
 
     @Test
@@ -116,7 +109,7 @@ class UsuarioApplicationServiceTest {
         when(usuarioRepository.buscaUsuarioPorId(usuarioFoco.getIdUsuario())).thenReturn(usuarioFoco);
         APIException exception = assertThrows(APIException.class,
                 ()-> usuarioApplicationService.mudaStatusParaFoco(usuarioFoco.getEmail(),usuarioFoco.getIdUsuario()));
-        assertEquals("Usuário ja esta em FOCO!", exception.getMessage());
+        assertEquals("Usuário já está em FOCO!", exception.getMessage());
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusException());
         verify(usuarioRepository, times(1)).buscaUsuarioPorEmail(usuarioFoco.getEmail());
     }

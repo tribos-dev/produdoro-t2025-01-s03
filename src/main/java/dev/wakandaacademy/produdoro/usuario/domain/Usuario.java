@@ -85,4 +85,20 @@ public class Usuario {
         }
         log.info("[finaliza] usuario - validaUsuario");
     }
+
+    public void alteraStatusParaFoco(UUID idUsuario) {
+        validaUsuario(idUsuario);
+        verificaStatusFoco();
+    }
+
+    private void verificaStatusFoco() {
+        if (this.status.equals(StatusUsuario.FOCO)) {
+            throw APIException.build(HttpStatus.BAD_REQUEST, "Usuário já está em FOCO!");
+        }
+        mudaStatusParaFoco();
+    }
+
+    public void mudaStatusParaFoco() {
+        this.status = StatusUsuario.FOCO;
+    }
 }

@@ -17,6 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@Setter
 @ToString
 @Document(collection = "Usuario")
 @Log4j2
@@ -76,18 +77,12 @@ public class Usuario {
 
     }
 
-    private void validaUsuario(UUID idUsuario) {
+    public void validaUsuario(UUID idUsuario) {
         log.info("[inicia] usuario - validaUsuario");
         if (!this.idUsuario.equals(idUsuario)) {
             log.info("[finaliza] APIExeception - validaUsuario");
             throw APIException.build(HttpStatus.UNAUTHORIZED, "credencial de autenticação não é válida.");
         }
         log.info("[finaliza] usuario - validaUsuario");
-    }
-
-    public void pertenceAoUsuario(Usuario usuarioEmail) {
-        if (!this.idUsuario.equals(usuarioEmail.getIdUsuario())) {
-            throw APIException.build(HttpStatus.UNAUTHORIZED, "Usuário(a) não autorizado(a) para a requisição solicitada");
-        }
     }
 }

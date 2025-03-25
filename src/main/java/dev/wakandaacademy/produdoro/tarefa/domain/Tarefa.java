@@ -41,6 +41,7 @@ public class Tarefa {
 	private StatusTarefa status;
 	private StatusAtivacaoTarefa statusAtivacao;
 	private int contagemPomodoro;
+	private int posicaoTarefa;
 
 	public Tarefa(TarefaRequest tarefaRequest) {
 		this.idTarefa = UUID.randomUUID();

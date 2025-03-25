@@ -41,6 +41,20 @@ public class Tarefa {
     private StatusTarefa status;
     private StatusAtivacaoTarefa statusAtivacao;
     private int contagemPomodoro;
+	@Id
+	private UUID idTarefa;
+	@NotBlank
+	private String descricao;
+	@Indexed
+	private UUID idUsuario;
+	@Indexed
+	private UUID idArea;
+	@Indexed
+	private UUID idProjeto;
+	private StatusTarefa status;
+	private StatusAtivacaoTarefa statusAtivacao;
+	private int contagemPomodoro;
+	private int posicaoTarefa;
 
     public Tarefa(TarefaRequest tarefaRequest) {
         this.idTarefa = UUID.randomUUID();
@@ -59,14 +73,15 @@ public class Tarefa {
         }
     }
 
-    public void incrementaPomodoro(Tarefa tarefa, Usuario usuario) {
-        if (!Objects.equals(usuario.getStatus(), StatusUsuario.FOCO)) {
-        }
-        this.ativaTarefa();
-        this.incrementaPomodoro();
-        StatusUsuario novoStatus = this.alteraStatusPorCadaPomodoro(this.contagemPomodoro);
-        //usuario.alterarStatusParaFoco(novoStatus);
-    }
+	public void incrementaPomodoro(Tarefa tarefa, Usuario usuario) {
+		if (!Objects.equals(usuario.getStatus(), StatusUsuario.FOCO)) {
+			throw APIException.build(HttpStatus.BAD_REQUEST, "Usuário precisa estar em FOCO para incrementar pomodoros.");
+		}
+		this.ativaTarefa();
+		this.incrementaPomodoro();
+		StatusUsuario novoStatus = this.alteraStatusPorCadaPomodoro(this.contagemPomodoro);
+		usuario.setStatus(novoStatus);
+	}
 
     private void ativaTarefa() {
         this.statusAtivacao = StatusAtivacaoTarefa.ATIVA;

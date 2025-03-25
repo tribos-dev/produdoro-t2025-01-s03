@@ -1,9 +1,11 @@
 package dev.wakandaacademy.produdoro.tarefa.application.service;
 
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaIdResponse;
+import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaListResponse;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaRequest;
 import dev.wakandaacademy.produdoro.tarefa.domain.Tarefa;
 
+import java.util.List;
 import java.util.UUID;
 public interface TarefaService {
     TarefaIdResponse criaNovaTarefa(TarefaRequest tarefaRequest);
@@ -11,4 +13,5 @@ public interface TarefaService {
     void incrementaPomodoro(String emailUsuario, UUID idTarefa);
 
     void concluiTarefa(String emailUsuario, UUID idTarefa);
+    List<TarefaListResponse> buscaTodasTarefas(String usuario, UUID idUsuario);
 }

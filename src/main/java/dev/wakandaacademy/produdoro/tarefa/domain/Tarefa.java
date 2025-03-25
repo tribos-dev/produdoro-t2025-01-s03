@@ -61,11 +61,12 @@ public class Tarefa {
 
 	public void incrementaPomodoro(Tarefa tarefa, Usuario usuario) {
 		if (!Objects.equals(usuario.getStatus(), StatusUsuario.FOCO)) {
+			throw APIException.build(HttpStatus.BAD_REQUEST, "Usuário precisa estar em FOCO para incrementar pomodoros.");
 		}
 		this.ativaTarefa();
 		this.incrementaPomodoro();
 		StatusUsuario novoStatus = this.alteraStatusPorCadaPomodoro(this.contagemPomodoro);
-		usuario.alterarStatusParaFoco(novoStatus);
+		usuario.setStatus(novoStatus);
 	}
 
 	private void ativaTarefa() {
@@ -78,5 +79,5 @@ public class Tarefa {
 
 	private StatusUsuario alteraStatusPorCadaPomodoro(int totalDePomodoros) {
 		return (totalDePomodoros % 4 == 0) ? StatusUsuario.PAUSA_LONGA : StatusUsuario.PAUSA_CURTA;
-	}
+    }
 }

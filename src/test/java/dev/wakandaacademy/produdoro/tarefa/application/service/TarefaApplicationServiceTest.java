@@ -106,4 +106,34 @@ class TarefaApplicationServiceTest {
         TarefaRequest request = new TarefaRequest("tarefa 1", UUID.randomUUID(), null, null, 0);
         return request;
     }
+
+    @Test
+    void deveConcluirTarefa() {
+        Usuario usuario = DataHelper.createUsuario();
+        Tarefa tarefa = DataHelper.createTarefa();
+
+        when(usuarioRepository.buscaUsuarioPorEmail(usuario.getEmail())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefaPorId(tarefa.getIdTarefa())).thenReturn(Optional.of(tarefa));
+        when(tarefaRepository.salva(tarefa)).thenReturn(tarefa);
+        tarefaApplicationService.concluiTarefa(usuario.getEmail(), tarefa.getIdTarefa());
+
+        assertEquals(StatusTarefa.CONCLUIDA,tarefa.getStatus());
+        verify(usuarioRepository, times(2)).buscaUsuarioPorEmail(usuario.getEmail());
+        verify(tarefaRepository, times(1)).buscaTarefaPorId(tarefa.getIdTarefa());
+        verify(tarefaRepository, times(1)).salva(tarefa);
+    }
+    @Test
+    void deveLancarExcecaoSeTarefaNaoEncontrada() {
+        Usuario usuario = DataHelper.createUsuario();
+        UUID idInvalido = UUID.randomUUID();
+
+        when(usuarioRepository.buscaUsuarioPorEmail(usuario.getEmail())).thenReturn(usuario);
+        APIException exception = assertThrows(APIException.class,
+                () ->tarefaApplicationService.concluiTarefa(usuario.getEmail(), idInvalido));
+
+        assertEquals(HttpStatus.NOT_FOUND,exception.getStatusException());
+        verify(usuarioRepository, times(2)).buscaUsuarioPorEmail(usuario.getEmail());
+        verify(tarefaRepository, times(1)).buscaTarefaPorId(idInvalido);
+        verify(tarefaRepository, never()).salva(any(Tarefa.class));
+    }
 }

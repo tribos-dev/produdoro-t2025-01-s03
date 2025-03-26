@@ -35,7 +35,7 @@ public class Tarefa {
     private int contagemPomodoro;
     private int posicaoTarefa;
 
-    public Tarefa(TarefaRequest tarefaRequest) {
+    public Tarefa(TarefaRequest tarefaRequest, int novaPosicao) {
         this.idTarefa = UUID.randomUUID();
         this.idUsuario = tarefaRequest.getIdUsuario();
         this.descricao = tarefaRequest.getDescricao();
@@ -44,6 +44,7 @@ public class Tarefa {
         this.status = StatusTarefa.A_FAZER;
         this.statusAtivacao = StatusAtivacaoTarefa.INATIVA;
         this.contagemPomodoro = 1;
+        this.posicaoTarefa = novaPosicao;
     }
 
     public void pertenceAoUsuario(Usuario usuarioPorEmail) {
@@ -79,7 +80,7 @@ public class Tarefa {
         return (totalDePomodoros % 4 == 0) ? StatusUsuario.PAUSA_LONGA : StatusUsuario.PAUSA_CURTA;
     }
 
-//    public void alteraPosicaoTarefa(int novaPosicaoTarefa) {
-//        this.posicaoTarefa = novaPosicaoTarefa;
-//    }
+    public void alteraPosicao(int novaPosicaoValue) {
+        this.posicaoTarefa = novaPosicaoValue;
+    }
 }

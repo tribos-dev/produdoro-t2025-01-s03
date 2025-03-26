@@ -68,7 +68,8 @@ public class TarefaInfraRepository implements TarefaRepository {
 
         if (novaPosicaoValue != posicaoAtual) {
             atualizaTarefasEntrePosicoes(todasTarefas, posicaoAtual, novaPosicaoValue);
-            atualizaPosicaoTarefa(tarefa, novaPosicaoValue);
+            tarefa.alteraPosicao(novaPosicaoValue);
+            tarefaSpringMongoDBRepository.save(tarefa);
         }
 
         log.info("[finish] TarefaInfraRepository - novaPosicaoTarefa");
@@ -81,7 +82,9 @@ public class TarefaInfraRepository implements TarefaRepository {
         final int fim = posicaoDestino > posicaoOrigem ? posicaoDestino : posicaoOrigem - 1;
 
         IntStream.rangeClosed(inicio, fim)
-                .forEach(i -> atualizaPosicaoTarefa(tarefas.get(i), i + incremento));
+                .forEach(i -> { Tarefa tarefa = tarefas.get(i);
+                    atualizaPosicaoTarefa(tarefa, i + incremento);
+                });
         log.info("[finish] TarefaInfraRepository - atualizaTarefasEntrePosicoes");
     }
 
@@ -122,5 +125,12 @@ public class TarefaInfraRepository implements TarefaRepository {
         List<Tarefa> todasAsTarefas = tarefaSpringMongoDBRepository.findAllByIdUsuario(idUsuario);
         log.info("[finaliza] TarefaInfraRepository - buscaTarefasDoUsuario");
         return todasAsTarefas;
+    }
+
+    @Override
+    public int contarTarefas(UUID idUsuario) {
+        List<Tarefa> tarefas = buscaTarefasDoUsuario(idUsuario);
+        int novaPosicao = tarefas.size();
+        return novaPosicao;
     }
 }

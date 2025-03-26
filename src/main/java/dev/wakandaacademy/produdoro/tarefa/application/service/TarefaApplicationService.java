@@ -27,7 +27,8 @@ public class TarefaApplicationService implements TarefaService {
     @Override
     public TarefaIdResponse criaNovaTarefa(TarefaRequest tarefaRequest) {
         log.info("[inicia] TarefaApplicationService - criaNovaTarefa");
-        Tarefa tarefaCriada = tarefaRepository.salva(new Tarefa(tarefaRequest));
+        int novaPosicao = tarefaRepository.contarTarefas(tarefaRequest.getIdUsuario());
+        Tarefa tarefaCriada = tarefaRepository.salva(new Tarefa(tarefaRequest, novaPosicao));
         log.info("[finaliza] TarefaApplicationService - criaNovaTarefa");
         return TarefaIdResponse.builder().idTarefa(tarefaCriada.getIdTarefa()).build();
     }
@@ -74,6 +75,7 @@ public class TarefaApplicationService implements TarefaService {
         log.info("[finaliza] TarefaApplicationService - buscaTodasTarefas");
         return TarefaListResponse.converte(tarefas);
     }
+
     @Override
     public void concluiTarefa(String emailUsuario, UUID idTarefa) {
         log.info("[inicia] TarefaApplicationService - concluiTarefa");
@@ -83,5 +85,4 @@ public class TarefaApplicationService implements TarefaService {
         tarefaRepository.salva(tarefa);
         log.info("[finaliza] TarefaApplicationService - concluiTarefa");
     }
-
 }

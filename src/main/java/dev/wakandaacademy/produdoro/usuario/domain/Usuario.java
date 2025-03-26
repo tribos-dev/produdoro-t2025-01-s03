@@ -105,8 +105,8 @@ public class Usuario {
         this.status = StatusUsuario.FOCO;
     }
 
-    public void pertenceAoUsuario(Usuario usuarioPorEmail) {
-        if (!this.idUsuario.equals(usuarioPorEmail.getIdUsuario())){
+    public void pertenceAoUsuario(UUID idUsuario) {
+        if (!this.idUsuario.equals(idUsuario)){
             throw APIException.build(HttpStatus.UNAUTHORIZED,
                     "Usuário(a) não autorizado(a) para a requisição solicitada! ");
         }

@@ -221,4 +221,22 @@ class TarefaApplicationServiceTest {
         assertEquals(HttpStatus.CONFLICT, exception.getStatusException());
         assertEquals("Usuário não possui tarefa(as) cadastrada(as)", exception.getMessage());
     }
+
+    @Test
+    void deletaTarefasConcluidas() {
+        Usuario usuario = DataHelper.createUsuario();
+        List<Tarefa> tarefasConcluidas = DataHelper.createListTarefasConcluidas();
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefasConcluidas(any())).thenReturn(tarefasConcluidas);
+        tarefaApplicationService.deletaTarefasConcluidas(usuario.getEmail(), usuario.getIdUsuario());
+        verify(tarefaRepository, times(1)).deletaTarefasConcluidas(tarefasConcluidas);
+    }
+
+    @Test
+    void deletaTarefasConcluidasLancaExceptionSeNaoEncontraTarefa() {
+        Usuario usuario = DataHelper.createUsuarioFoco();
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        assertThrows(APIException.class,
+                () -> tarefaApplicationService.deletaTarefasConcluidas(usuario.getEmail(), UUID.randomUUID()));
+    }
 }

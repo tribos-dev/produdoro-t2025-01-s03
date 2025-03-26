@@ -1,5 +1,6 @@
 package dev.wakandaacademy.produdoro.usuario.domain;
 
+
 import dev.wakandaacademy.produdoro.handler.APIException;
 import dev.wakandaacademy.produdoro.pomodoro.domain.ConfiguracaoPadrao;
 import dev.wakandaacademy.produdoro.usuario.application.api.UsuarioNovoRequest;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import javax.validation.constraints.Email;
 import java.util.UUID;
 
+
 @Builder
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -22,6 +24,7 @@ import java.util.UUID;
 @Document(collection = "Usuario")
 @Log4j2
 public class Usuario {
+
     @Id
     private UUID idUsuario;
     @Email
@@ -101,4 +104,12 @@ public class Usuario {
     public void mudaStatusParaFoco() {
         this.status = StatusUsuario.FOCO;
     }
+
+    public void pertenceAoUsuario(UUID idUsuario) {
+        if (!this.idUsuario.equals(idUsuario)){
+            throw APIException.build(HttpStatus.UNAUTHORIZED,
+                    "Usuário(a) não autorizado(a) para a requisição solicitada! ");
+        }
+    }
 }
+

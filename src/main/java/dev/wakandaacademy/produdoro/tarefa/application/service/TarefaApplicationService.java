@@ -44,6 +44,26 @@ public class TarefaApplicationService implements TarefaService {
     }
 
     @Override
+    public void deletaTarefasConcluidas(String email, UUID idUsuario) {
+        log.info("[inicia] TarefaApplicationService - deletaTarefasConcluidas");
+        validaUsuario(email, idUsuario);
+        List<Tarefa> tarefasConcluidas = tarefaRepository.buscaTarefasConcluidas(idUsuario);
+        if (tarefasConcluidas.isEmpty()){
+            throw APIException.build(HttpStatus.NOT_FOUND, "Usuário nâo possue nenhuma tarefa concluída");
+        }
+        tarefaRepository.deletaTarefasConcluidas(tarefasConcluidas);
+        log.info("[finaliza] TarefaApplicationService - deletaTarefasConcluidas");
+
+    }
+
+    private void validaUsuario(String email, UUID idUsuario) {
+        Usuario usuarioPorEmail = usuarioRepository.buscaUsuarioPorEmail(email);
+        usuarioRepository.buscaUsuarioPorId(idUsuario);
+        usuarioPorEmail.pertenceAoUsuario(idUsuario);
+
+    }
+
+    @Override
     public void incrementaPomodoro(String emailUsuario, UUID idTarefa) {
         log.info("[inicia] TarefaApplicationService - incrementaPomodoro");
         Usuario usuario = usuarioRepository.buscaUsuarioPorEmail(emailUsuario);
@@ -54,7 +74,6 @@ public class TarefaApplicationService implements TarefaService {
         log.info("[finaliza] TarefaApplicationService - incrementaPomodoro");
 
     }
-
 
     @Override
     public List<TarefaListResponse> buscaTodasTarefas(String usuario, UUID idUsuario) {
@@ -75,7 +94,6 @@ public class TarefaApplicationService implements TarefaService {
         tarefaRepository.salva(tarefa);
         log.info("[finaliza] TarefaApplicationService - concluiTarefa");
     }
-
 
     @Override
     public void deletaTodasTarefas(String email, UUID idUsuario) {

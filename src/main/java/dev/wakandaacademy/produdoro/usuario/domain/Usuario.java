@@ -1,5 +1,6 @@
 package dev.wakandaacademy.produdoro.usuario.domain;
 
+
 import dev.wakandaacademy.produdoro.handler.APIException;
 import dev.wakandaacademy.produdoro.pomodoro.domain.ConfiguracaoPadrao;
 import dev.wakandaacademy.produdoro.usuario.application.api.UsuarioNovoRequest;
@@ -13,13 +14,14 @@ import org.springframework.http.HttpStatus;
 import javax.validation.constraints.Email;
 import java.util.UUID;
 
+
 @Builder
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Setter
 @ToString
-@Document(collection = "dev.wakandaacademy.produdoro.usuario.application.Usuario")
+@Document(collection = "Usuario")
 @Log4j2
 public class Usuario {
 
@@ -88,14 +90,8 @@ public class Usuario {
     }
 
     public void alteraStatusParaFoco(UUID idUsuario) {
-        validaUsuarioPorId(idUsuario);
+        validaUsuario(idUsuario);
         verificaStatusFoco();
-    }
-
-    public void validaUsuarioPorId(UUID idUsuario) {
-        if (!this.idUsuario.equals(idUsuario)) {
-            throw APIException.build(HttpStatus.UNAUTHORIZED, "Credencial de autenticação não é válida!");
-        }
     }
 
     private void verificaStatusFoco() {
@@ -107,5 +103,12 @@ public class Usuario {
 
     public void mudaStatusParaFoco() {
         this.status = StatusUsuario.FOCO;
+    }
+
+    public void pertenceAoUsuario(UUID idUsuario) {
+        if (!this.idUsuario.equals(idUsuario)){
+            throw APIException.build(HttpStatus.UNAUTHORIZED,
+                    "Usuário(a) não autorizado(a) para a requisição solicitada! ");
+        }
     }
 }

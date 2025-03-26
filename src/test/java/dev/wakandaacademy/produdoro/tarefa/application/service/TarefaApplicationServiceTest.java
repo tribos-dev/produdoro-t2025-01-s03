@@ -1,6 +1,7 @@
 package dev.wakandaacademy.produdoro.tarefa.application.service;
 
 import dev.wakandaacademy.produdoro.DataHelper;
+import dev.wakandaacademy.produdoro.config.security.service.TokenService;
 import dev.wakandaacademy.produdoro.handler.APIException;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaIdResponse;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaListResponse;
@@ -18,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
+import java.util.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,11 +43,15 @@ class TarefaApplicationServiceTest {
     @Mock
     UsuarioRepository usuarioRepository;
 
+    @Mock
+    TokenService tokenService;
+
 
     @Test
     void deveRetornarIdTarefaNovaCriada() {
         TarefaRequest request = getTarefaRequest();
-        when(tarefaRepository.salva(any())).thenReturn(new Tarefa(request));
+        int posicao = 0;
+        when(tarefaRepository.salva(any())).thenReturn(new Tarefa(request, posicao));
 
         TarefaIdResponse response = tarefaApplicationService.criaNovaTarefa(request);
 
@@ -53,6 +59,7 @@ class TarefaApplicationServiceTest {
         assertEquals(TarefaIdResponse.class, response.getClass());
         assertEquals(UUID.class, response.getIdTarefa().getClass());
     }
+
     @Test
     @DisplayName("Deve incrementar pomodoro")
     void deveIncrementarPomodoro() {
@@ -148,5 +155,90 @@ class TarefaApplicationServiceTest {
         verify(usuarioRepository, times(2)).buscaUsuarioPorEmail(usuario.getEmail());
         verify(tarefaRepository, times(1)).buscaTarefaPorId(idInvalido);
         verify(tarefaRepository, never()).salva(any(Tarefa.class));
+    }
+
+    @Test
+    void deveExcluirTodasAsTarefasDoUsuarioLogado() {
+        Usuario usuario = DataHelper.createUsuario();
+        List<Tarefa> tarefas = DataHelper.createListTarefa();
+
+        when(usuarioRepository.buscaUsuarioPorId(any())).thenReturn(usuario);
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefasDoUsuario(usuario.getIdUsuario())).thenReturn(tarefas);
+        tarefaApplicationService.deletaTodasTarefas(usuario.getEmail(), usuario.getIdUsuario());
+        verify(tarefaRepository, times(1)).deletaTodasTarefasUsuario(tarefas);
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoUsuarioNaoExisteExcluirTarefas() {
+        UUID usuarioInexistente = UUID.randomUUID();
+
+        when(usuarioRepository.buscaUsuarioPorId(usuarioInexistente))
+                .thenThrow((APIException.build(HttpStatus.BAD_REQUEST, "Usuario não encontrado!")));
+
+        APIException exception = assertThrows(APIException.class, () -> {
+            tarefaApplicationService.deletaTodasTarefas("email@exemplo.com", usuarioInexistente);
+        });
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusException());
+        assertEquals("Usuario não encontrado!", exception.getMessage());
+
+        verify(usuarioRepository, times(1)).buscaUsuarioPorId(usuarioInexistente);
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoUsuarioTentarExcluirTarefaNaoLogado() {
+        Usuario usuarioNaoLogado = DataHelper.createUsuario();
+
+        when(tokenService.getUsuarioByBearerToken("email@exemplo.com"))
+                .thenThrow((APIException.build(HttpStatus.UNAUTHORIZED,
+                        "Usuário(a) não autorizado(a) para a requisição solicitada")));
+
+        APIException exception = assertThrows(APIException.class, () -> {
+            tokenService.getUsuarioByBearerToken("email@exemplo.com");
+        });
+
+        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatusException());
+        assertEquals("Usuário(a) não autorizado(a) para a requisição solicitada",
+                exception.getMessage());
+
+        verify(usuarioRepository,
+                times(0)).buscaUsuarioPorId(usuarioNaoLogado.getIdUsuario());
+
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoUsuarioTentarExcluirTarefaInexistente() {
+        Usuario usuario = DataHelper.createUsuario();
+        List<Tarefa> tarefas = Collections.emptyList();
+
+        when(usuarioRepository.buscaUsuarioPorId(any())).thenReturn(usuario);
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefasDoUsuario(usuario.getIdUsuario())).thenReturn(tarefas);
+
+        APIException exception = assertThrows(APIException.class, () -> {
+            tarefaApplicationService.deletaTodasTarefas(usuario.getEmail(), usuario.getIdUsuario());
+        });
+
+        assertEquals(HttpStatus.CONFLICT, exception.getStatusException());
+        assertEquals("Usuário não possui tarefa(as) cadastrada(as)", exception.getMessage());
+    }
+
+    @Test
+    void deletaTarefasConcluidas() {
+        Usuario usuario = DataHelper.createUsuario();
+        List<Tarefa> tarefasConcluidas = DataHelper.createListTarefasConcluidas();
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        when(tarefaRepository.buscaTarefasConcluidas(any())).thenReturn(tarefasConcluidas);
+        tarefaApplicationService.deletaTarefasConcluidas(usuario.getEmail(), usuario.getIdUsuario());
+        verify(tarefaRepository, times(1)).deletaTarefasConcluidas(tarefasConcluidas);
+    }
+
+    @Test
+    void deletaTarefasConcluidasLancaExceptionSeNaoEncontraTarefa() {
+        Usuario usuario = DataHelper.createUsuarioFoco();
+        when(usuarioRepository.buscaUsuarioPorEmail(any())).thenReturn(usuario);
+        assertThrows(APIException.class,
+                () -> tarefaApplicationService.deletaTarefasConcluidas(usuario.getEmail(), UUID.randomUUID()));
     }
 }

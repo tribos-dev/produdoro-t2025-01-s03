@@ -3,6 +3,7 @@ package dev.wakandaacademy.produdoro.tarefa.infra;
 import dev.wakandaacademy.produdoro.handler.APIException;
 import dev.wakandaacademy.produdoro.tarefa.application.api.NovaPosicaoRequest;
 import dev.wakandaacademy.produdoro.tarefa.application.repository.TarefaRepository;
+import dev.wakandaacademy.produdoro.tarefa.domain.StatusTarefa;
 import dev.wakandaacademy.produdoro.tarefa.domain.Tarefa;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -53,6 +54,22 @@ public class TarefaInfraRepository implements TarefaRepository {
     }
 
     @Override
+    public List<Tarefa> buscaTarefasConcluidas(UUID idUsuario) {
+        log.info("[inicia] TarefaRestController - buscaTarefasConcluidas");
+        List<Tarefa> tarefasConcluidas = tarefaSpringMongoDBRepository.findAllByIdUsuarioAndStatus(idUsuario, StatusTarefa.CONCLUIDA);
+        log.info("[finaliza] TarefaRestController - buscaTarefasConcluidas");
+        return tarefasConcluidas;
+    }
+
+    @Override
+    public void deletaTarefasConcluidas(List<Tarefa> tarefasConcluidas) {
+        log.info("[inicia] TarefaInfraRepository - deletaVariasTarefas");
+        tarefaSpringMongoDBRepository.deleteAll(tarefasConcluidas);
+        log.info("[finaliza] TarefaInfraRepository - deletaVariasTarefas");
+
+    }
+
+    @Override
     public List<Tarefa> buscaPorIdUsuario(UUID idUsuario) {
         return tarefaSpringMongoDBRepository.findByIdUsuario(idUsuario);
     }
@@ -82,7 +99,8 @@ public class TarefaInfraRepository implements TarefaRepository {
         final int fim = posicaoDestino > posicaoOrigem ? posicaoDestino : posicaoOrigem - 1;
 
         IntStream.rangeClosed(inicio, fim)
-                .forEach(i -> { Tarefa tarefa = tarefas.get(i);
+                .forEach(i -> {
+                    Tarefa tarefa = tarefas.get(i);
                     atualizaPosicaoTarefa(tarefa, i + incremento);
                 });
         log.info("[finish] TarefaInfraRepository - atualizaTarefasEntrePosicoes");
@@ -117,6 +135,14 @@ public class TarefaInfraRepository implements TarefaRepository {
                     String.format(POSICAO_IGUAL_MENSAGEM, posicaoAtual));
         }
         log.info("[finish] TarefaInfraRepository - validarLimitesPosicao");
+    }
+
+    @Override
+    public void deletaTodasTarefasUsuario(List<Tarefa> tarefaList) {
+        log.info("[inicia] TarefaInfraRepository - deletaTarefasDoUsuario");
+        tarefaSpringMongoDBRepository.deleteAll(tarefaList);
+        log.info("[finaliza] TarefaInfraRepository - deletaTarefasDoUsuario");
+
     }
 
     @Override

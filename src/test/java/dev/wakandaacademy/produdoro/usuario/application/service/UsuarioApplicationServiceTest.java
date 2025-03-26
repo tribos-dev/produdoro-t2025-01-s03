@@ -91,7 +91,6 @@ class UsuarioApplicationServiceTest {
     }
 
 
-
     @Test
     void DeveAlterarStatusParaFoco() {
         Usuario usuario = DataHelper.createUsuario();

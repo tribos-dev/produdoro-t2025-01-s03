@@ -1,6 +1,8 @@
 package dev.wakandaacademy.produdoro.tarefa.application.repository;
 
+import dev.wakandaacademy.produdoro.tarefa.application.api.NovaPosicaoRequest;
 import dev.wakandaacademy.produdoro.tarefa.domain.Tarefa;
+import lombok.NonNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +15,9 @@ public interface TarefaRepository {
     List<Tarefa> buscaTarefasConcluidas(UUID idUsuario);
     void deletaTarefasConcluidas(List<Tarefa> tarefasConcluidas);
     List<Tarefa> buscaPorIdUsuario(UUID idUsuario);
+    void novaPosicaoTarefa(Tarefa tarefa, List<Tarefa> todasTarefas, NovaPosicaoRequest novaPosicao);
     List<Tarefa> buscaTarefasDoUsuario(UUID idUsuario);
     void deletaTodasTarefasUsuario(List<Tarefa> Tarefa);
 
+    int contarTarefas(UUID idUsuario);
 }

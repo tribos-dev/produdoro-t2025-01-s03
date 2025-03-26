@@ -26,7 +26,7 @@ public class DataHelper {
 
     public static Tarefa createTarefa() {
         return Tarefa.builder().contagemPomodoro(1).idTarefa(UUID.fromString("06fb5521-9d5a-461a-82fb-e67e3bedc6eb"))
-                .idUsuario(usuario1).descricao("descricao tarefa").statusAtivacao(StatusAtivacaoTarefa.INATIVA).build();
+                .idUsuario(usuario1).descricao("descricao tarefa").statusAtivacao(StatusAtivacaoTarefa.INATIVA).posicaoTarefa(0).build();
     }
 
     public static UsuarioNovoRequest getUsuarioRequest() {

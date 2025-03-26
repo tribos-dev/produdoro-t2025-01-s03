@@ -1,6 +1,7 @@
 package dev.wakandaacademy.produdoro.tarefa.application.service;
 
 import dev.wakandaacademy.produdoro.handler.APIException;
+import dev.wakandaacademy.produdoro.tarefa.application.api.NovaPosicaoRequest;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaIdResponse;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaListResponse;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaRequest;
@@ -23,14 +24,15 @@ public class TarefaApplicationService implements TarefaService {
     private final TarefaRepository tarefaRepository;
     private final UsuarioRepository usuarioRepository;
 
-
     @Override
     public TarefaIdResponse criaNovaTarefa(TarefaRequest tarefaRequest) {
         log.info("[inicia] TarefaApplicationService - criaNovaTarefa");
-        Tarefa tarefaCriada = tarefaRepository.salva(new Tarefa(tarefaRequest));
+        int novaPosicao = tarefaRepository.contarTarefas(tarefaRequest.getIdUsuario());
+        Tarefa tarefaCriada = tarefaRepository.salva(new Tarefa(tarefaRequest, novaPosicao));
         log.info("[finaliza] TarefaApplicationService - criaNovaTarefa");
         return TarefaIdResponse.builder().idTarefa(tarefaCriada.getIdTarefa()).build();
     }
+
     @Override
     public Tarefa detalhaTarefa(String usuario, UUID idTarefa) {
         log.info("[inicia] TarefaApplicationService - detalhaTarefa");
@@ -72,7 +74,15 @@ public class TarefaApplicationService implements TarefaService {
         usuarioRepository.salva(usuario);
         tarefaRepository.salva(tarefa);
         log.info("[finaliza] TarefaApplicationService - incrementaPomodoro");
+    }
 
+    @Override
+    public void alteraPosicaoTarefa(String usuario, UUID idTarefa, NovaPosicaoRequest novaPosicao) {
+        log.info("[start] TarefaApplicationService - alteraPosicaoTarefa");
+        Tarefa tarefa = detalhaTarefa(usuario, idTarefa);
+        List<Tarefa> todasTarefas = tarefaRepository.buscaTarefasDoUsuario(tarefa.getIdUsuario());
+        tarefaRepository.novaPosicaoTarefa(tarefa, todasTarefas, novaPosicao);
+        log.info("[finish] TarefaApplicationService - alteraPosicaoTarefa");
     }
 
     @Override
@@ -85,6 +95,7 @@ public class TarefaApplicationService implements TarefaService {
         log.info("[finaliza] TarefaApplicationService - buscaTodasTarefas");
         return TarefaListResponse.converte(tarefas);
     }
+
     @Override
     public void concluiTarefa(String emailUsuario, UUID idTarefa) {
         log.info("[inicia] TarefaApplicationService - concluiTarefa");

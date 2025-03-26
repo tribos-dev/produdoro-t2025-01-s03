@@ -50,7 +50,8 @@ class TarefaApplicationServiceTest {
     @Test
     void deveRetornarIdTarefaNovaCriada() {
         TarefaRequest request = getTarefaRequest();
-        when(tarefaRepository.salva(any())).thenReturn(new Tarefa(request));
+        int posicao = 0;
+        when(tarefaRepository.salva(any())).thenReturn(new Tarefa(request, posicao));
 
         TarefaIdResponse response = tarefaApplicationService.criaNovaTarefa(request);
 
@@ -58,6 +59,7 @@ class TarefaApplicationServiceTest {
         assertEquals(TarefaIdResponse.class, response.getClass());
         assertEquals(UUID.class, response.getIdTarefa().getClass());
     }
+
     @Test
     @DisplayName("Deve incrementar pomodoro")
     void deveIncrementarPomodoro() {

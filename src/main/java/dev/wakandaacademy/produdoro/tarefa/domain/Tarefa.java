@@ -1,26 +1,18 @@
 package dev.wakandaacademy.produdoro.tarefa.domain;
 
-import java.util.UUID;
-import java.util.Objects;
-
 import dev.wakandaacademy.produdoro.handler.APIException;
-import dev.wakandaacademy.produdoro.usuario.domain.StatusUsuario;
-
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaRequest;
+import dev.wakandaacademy.produdoro.usuario.domain.StatusUsuario;
 import dev.wakandaacademy.produdoro.usuario.domain.Usuario;
-
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.http.HttpStatus;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import javax.validation.constraints.NotBlank;
+import java.util.Objects;
+import java.util.UUID;
 
 @Builder
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -41,9 +33,9 @@ public class Tarefa {
     private StatusTarefa status;
     private StatusAtivacaoTarefa statusAtivacao;
     private int contagemPomodoro;
-	private int posicaoTarefa;
+    private int posicaoTarefa;
 
-    public Tarefa(TarefaRequest tarefaRequest) {
+    public Tarefa(TarefaRequest tarefaRequest, int novaPosicao) {
         this.idTarefa = UUID.randomUUID();
         this.idUsuario = tarefaRequest.getIdUsuario();
         this.descricao = tarefaRequest.getDescricao();
@@ -52,6 +44,7 @@ public class Tarefa {
         this.status = StatusTarefa.A_FAZER;
         this.statusAtivacao = StatusAtivacaoTarefa.INATIVA;
         this.contagemPomodoro = 1;
+        this.posicaoTarefa = novaPosicao;
     }
 
     public void pertenceAoUsuario(Usuario usuarioPorEmail) {
@@ -60,15 +53,15 @@ public class Tarefa {
         }
     }
 
-	public void incrementaPomodoro(Tarefa tarefa, Usuario usuario) {
-		if (!Objects.equals(usuario.getStatus(), StatusUsuario.FOCO)) {
-			throw APIException.build(HttpStatus.BAD_REQUEST, "Usuário precisa estar em FOCO para incrementar pomodoros.");
-		}
-		this.ativaTarefa();
-		this.incrementaPomodoro();
-		StatusUsuario novoStatus = this.alteraStatusPorCadaPomodoro(this.contagemPomodoro);
-		usuario.setStatus(novoStatus);
-	}
+    public void incrementaPomodoro(Tarefa tarefa, Usuario usuario) {
+        if (!Objects.equals(usuario.getStatus(), StatusUsuario.FOCO)) {
+            throw APIException.build(HttpStatus.BAD_REQUEST, "Usuário precisa estar em FOCO para incrementar pomodoros.");
+        }
+        this.ativaTarefa();
+        this.incrementaPomodoro();
+        StatusUsuario novoStatus = this.alteraStatusPorCadaPomodoro(this.contagemPomodoro);
+        usuario.setStatus(novoStatus);
+    }
 
     private void ativaTarefa() {
         this.statusAtivacao = StatusAtivacaoTarefa.ATIVA;
@@ -78,12 +71,16 @@ public class Tarefa {
         this.contagemPomodoro++;
     }
 
+    public void mudaStatusParaConcluido(Usuario usuario) {
+        pertenceAoUsuario(usuario);
+        this.status = StatusTarefa.CONCLUIDA;
+    }
+
     private StatusUsuario alteraStatusPorCadaPomodoro(int totalDePomodoros) {
         return (totalDePomodoros % 4 == 0) ? StatusUsuario.PAUSA_LONGA : StatusUsuario.PAUSA_CURTA;
     }
 
-    public void mudaStatusParaConcluido(Usuario usuario) {
-        pertenceAoUsuario(usuario);
-	    this.status = StatusTarefa.CONCLUIDA;
+    public void alteraPosicao(int novaPosicaoValue) {
+        this.posicaoTarefa = novaPosicaoValue;
     }
 }

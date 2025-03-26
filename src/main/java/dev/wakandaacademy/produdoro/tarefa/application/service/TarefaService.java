@@ -2,9 +2,11 @@ package dev.wakandaacademy.produdoro.tarefa.application.service;
 
 import dev.wakandaacademy.produdoro.tarefa.application.api.NovaPosicaoRequest;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaIdResponse;
+import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaListResponse;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaRequest;
 import dev.wakandaacademy.produdoro.tarefa.domain.Tarefa;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface TarefaService {
@@ -12,4 +14,6 @@ public interface TarefaService {
     Tarefa detalhaTarefa(String usuario, UUID idTarefa);
     void incrementaPomodoro(String emailUsuario, UUID idTarefa);
     void alteraPosicaoTarefa(String usuario, UUID idTarefa, NovaPosicaoRequest novaPosicao);
+    void concluiTarefa(String emailUsuario, UUID idTarefa);
+    List<TarefaListResponse> buscaTodasTarefas(String usuario, UUID idUsuario);
 }

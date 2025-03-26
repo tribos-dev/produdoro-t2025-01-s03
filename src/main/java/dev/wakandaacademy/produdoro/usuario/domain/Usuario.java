@@ -17,10 +17,12 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@Setter
 @ToString
-@Document(collection = "Usuario")
+@Document(collection = "dev.wakandaacademy.produdoro.usuario.application.Usuario")
 @Log4j2
 public class Usuario {
+
     @Id
     private UUID idUsuario;
     @Email
@@ -76,7 +78,7 @@ public class Usuario {
 
     }
 
-    private void validaUsuario(UUID idUsuario) {
+    public void validaUsuario(UUID idUsuario) {
         log.info("[inicia] usuario - validaUsuario");
         if (!this.idUsuario.equals(idUsuario)) {
             log.info("[finaliza] APIExeception - validaUsuario");
@@ -85,7 +87,25 @@ public class Usuario {
         log.info("[finaliza] usuario - validaUsuario");
     }
 
-    public void alterarStatusParaFoco(StatusUsuario novoStatus) {
+    public void alteraStatusParaFoco(UUID idUsuario) {
+        validaUsuarioPorId(idUsuario);
+        verificaStatusFoco();
+    }
 
+    public void validaUsuarioPorId(UUID idUsuario) {
+        if (!this.idUsuario.equals(idUsuario)) {
+            throw APIException.build(HttpStatus.UNAUTHORIZED, "Credencial de autenticação não é válida!");
+        }
+    }
+
+    private void verificaStatusFoco() {
+        if (this.status.equals(StatusUsuario.FOCO)) {
+            throw APIException.build(HttpStatus.BAD_REQUEST, "Usuário já está em FOCO!");
+        }
+        mudaStatusParaFoco();
+    }
+
+    public void mudaStatusParaFoco() {
+        this.status = StatusUsuario.FOCO;
     }
 }

@@ -20,61 +20,66 @@ import java.util.UUID;
 @Getter
 @Document(collection = "Tarefa")
 public class Tarefa {
-	@Id
-	private UUID idTarefa;
-	@NotBlank
-	private String descricao;
-	@Indexed
-	private UUID idUsuario;
-	@Indexed
-	private UUID idArea;
-	@Indexed
-	private UUID idProjeto;
-	private StatusTarefa status;
-	private StatusAtivacaoTarefa statusAtivacao;
-	private int contagemPomodoro;
-	private Integer posicao;
+    @Id
+    private UUID idTarefa;
+    @NotBlank
+    private String descricao;
+    @Indexed
+    private UUID idUsuario;
+    @Indexed
+    private UUID idArea;
+    @Indexed
+    private UUID idProjeto;
+    private StatusTarefa status;
+    private StatusAtivacaoTarefa statusAtivacao;
+    private int contagemPomodoro;
+    private int posicaoTarefa;
 
-	public Tarefa(TarefaRequest tarefaRequest, int novaPosicao) {
-		this.idTarefa = UUID.randomUUID();
-		this.idUsuario = tarefaRequest.getIdUsuario();
-		this.descricao = tarefaRequest.getDescricao();
-		this.idArea = tarefaRequest.getIdArea();
-		this.idProjeto = tarefaRequest.getIdProjeto();
-		this.status = StatusTarefa.A_FAZER;
-		this.statusAtivacao = StatusAtivacaoTarefa.INATIVA;
-		this.contagemPomodoro = 1;
-		this.posicao = novaPosicao;
-	}
+    public Tarefa(TarefaRequest tarefaRequest) {
+        this.idTarefa = UUID.randomUUID();
+        this.idUsuario = tarefaRequest.getIdUsuario();
+        this.descricao = tarefaRequest.getDescricao();
+        this.idArea = tarefaRequest.getIdArea();
+        this.idProjeto = tarefaRequest.getIdProjeto();
+        this.status = StatusTarefa.A_FAZER;
+        this.statusAtivacao = StatusAtivacaoTarefa.INATIVA;
+        this.contagemPomodoro = 1;
+    }
 
-	public void pertenceAoUsuario(Usuario usuarioPorEmail) {
-		if(!this.idUsuario.equals(usuarioPorEmail.getIdUsuario())) {
-			throw APIException.build(HttpStatus.UNAUTHORIZED, "Usuário não é dono da tarefa solicitada!");
-		}
-	}
+    public void pertenceAoUsuario(Usuario usuarioPorEmail) {
+        if (!this.idUsuario.equals(usuarioPorEmail.getIdUsuario())) {
+            throw APIException.build(HttpStatus.UNAUTHORIZED, "Usuário não é dono da tarefa solicitada!");
+        }
+    }
 
-	public void incrementaPomodoro(Tarefa tarefa, Usuario usuario) {
-		if (!Objects.equals(usuario.getStatus(), StatusUsuario.FOCO)) {
-		}
-		this.ativaTarefa();
-		this.incrementaPomodoro();
-		StatusUsuario novoStatus = this.alteraStatusPorCadaPomodoro(this.contagemPomodoro);
-		usuario.alterarStatusParaFoco(novoStatus);
-	}
+    public void incrementaPomodoro(Tarefa tarefa, Usuario usuario) {
+        if (!Objects.equals(usuario.getStatus(), StatusUsuario.FOCO)) {
+            throw APIException.build(HttpStatus.BAD_REQUEST, "Usuário precisa estar em FOCO para incrementar pomodoros.");
+        }
+        this.ativaTarefa();
+        this.incrementaPomodoro();
+        StatusUsuario novoStatus = this.alteraStatusPorCadaPomodoro(this.contagemPomodoro);
+        usuario.setStatus(novoStatus);
+    }
 
-	private void ativaTarefa() {
-		this.statusAtivacao = StatusAtivacaoTarefa.ATIVA;
-	}
+    private void ativaTarefa() {
+        this.statusAtivacao = StatusAtivacaoTarefa.ATIVA;
+    }
 
-	private void incrementaPomodoro() {
-		this.contagemPomodoro++;
-	}
+    private void incrementaPomodoro() {
+        this.contagemPomodoro++;
+    }
 
-	private StatusUsuario alteraStatusPorCadaPomodoro(int totalDePomodoros) {
-		return (totalDePomodoros % 4 == 0) ? StatusUsuario.PAUSA_LONGA : StatusUsuario.PAUSA_CURTA;
-	}
+    public void mudaStatusParaConcluido(Usuario usuario) {
+        pertenceAoUsuario(usuario);
+        this.status = StatusTarefa.CONCLUIDA;
+    }
 
-	public void alteraPosicaoTarefa(int novaPosicaoTarefa) {
-		this.posicao = novaPosicaoTarefa;
-	}
+    private StatusUsuario alteraStatusPorCadaPomodoro(int totalDePomodoros) {
+        return (totalDePomodoros % 4 == 0) ? StatusUsuario.PAUSA_LONGA : StatusUsuario.PAUSA_CURTA;
+    }
+
+//    public void alteraPosicaoTarefa(int novaPosicaoTarefa) {
+//        this.posicaoTarefa = novaPosicaoTarefa;
+//    }
 }

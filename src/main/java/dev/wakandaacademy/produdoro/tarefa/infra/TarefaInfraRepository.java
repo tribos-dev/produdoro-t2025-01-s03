@@ -63,7 +63,7 @@ public class TarefaInfraRepository implements TarefaRepository {
 
         validaNovaPosicao(tarefa, todasTarefas, novaPosicao);
 
-        final int posicaoAtual = tarefa.getPosicao();
+        final int posicaoAtual = tarefa.getPosicaoTarefa();
         final int novaPosicaoValue = novaPosicao.getNovaPosicao();
 
         if (novaPosicaoValue != posicaoAtual) {
@@ -95,7 +95,7 @@ public class TarefaInfraRepository implements TarefaRepository {
 
     private void validaNovaPosicao(Tarefa tarefa, List<Tarefa> todasTarefas, NovaPosicaoRequest novaPosicao) {
         log.info("[start] TarefaInfraRepository - validaNovaPosicao");
-        int posicaoAtual = tarefa.getPosicao();
+        int posicaoAtual = tarefa.getPosicaoTarefa();
         int novaPosicaoValue = novaPosicao.getNovaPosicao();
         int totalTarefas = todasTarefas.size();
 
@@ -114,5 +114,13 @@ public class TarefaInfraRepository implements TarefaRepository {
                     String.format(POSICAO_IGUAL_MENSAGEM, posicaoAtual));
         }
         log.info("[finish] TarefaInfraRepository - validarLimitesPosicao");
+    }
+
+    @Override
+    public List<Tarefa> buscaTarefasDoUsuario(UUID idUsuario) {
+        log.info("[inicia] TarefaInfraRepository - buscaTarefasDoUsuario");
+        List<Tarefa> todasAsTarefas = tarefaSpringMongoDBRepository.findAllByIdUsuario(idUsuario);
+        log.info("[finaliza] TarefaInfraRepository - buscaTarefasDoUsuario");
+        return todasAsTarefas;
     }
 }

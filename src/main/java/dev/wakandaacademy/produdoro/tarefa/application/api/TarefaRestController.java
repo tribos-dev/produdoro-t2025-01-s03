@@ -4,12 +4,12 @@ import dev.wakandaacademy.produdoro.config.security.service.TokenService;
 import dev.wakandaacademy.produdoro.handler.APIException;
 import dev.wakandaacademy.produdoro.tarefa.application.service.TarefaService;
 import dev.wakandaacademy.produdoro.tarefa.domain.Tarefa;
-import dev.wakandaacademy.produdoro.usuario.domain.Usuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -57,5 +57,22 @@ public class TarefaRestController implements TarefaAPI {
         String usuario = tokenService.getUsuarioByBearerToken(token).orElseThrow(() -> APIException.build(HttpStatus.UNAUTHORIZED, token));
         log.info("[usuario] {}", usuario);
         return usuario;
+    }
+
+    @Override
+    public List<TarefaListResponse> listaTodasTarefas(String token, UUID idUsuario) {
+        log.info("[inicia] TarefaRestController - listaTodasTarefas");
+        String usuario = getUsuarioByToken(token);
+        List<TarefaListResponse> tarefas = tarefaService.buscaTodasTarefas(usuario, idUsuario);
+        log.info("[finaliza] TarefaRestController - listaTodasTarefas");
+        return tarefas;
+    }
+
+    @Override
+    public void concluiTarefa(String token, UUID idTarefa) {
+        log.info("[inicia] TarefaRestController - concluiTarefa");
+        String emailUsuario = getUsuarioByToken(token);
+        tarefaService.concluiTarefa(emailUsuario, idTarefa);
+        log.info("[finaliza] TarefaRestController - concluiTarefa");
     }
 }

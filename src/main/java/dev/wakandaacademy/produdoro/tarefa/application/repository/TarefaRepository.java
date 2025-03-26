@@ -13,4 +13,5 @@ public interface TarefaRepository {
     Optional<Tarefa> buscaTarefaPorId(UUID idTarefa);
     List<Tarefa> buscaPorIdUsuario(UUID idUsuario);
     void novaPosicaoTarefa(Tarefa tarefa, List<Tarefa> todasTarefas, NovaPosicaoRequest novaPosicao);
+    List<Tarefa> buscaTarefasDoUsuario(UUID idUsuario);
 }

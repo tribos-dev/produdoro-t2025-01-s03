@@ -4,6 +4,7 @@ import dev.wakandaacademy.produdoro.config.security.service.TokenService;
 import dev.wakandaacademy.produdoro.handler.APIException;
 import dev.wakandaacademy.produdoro.tarefa.application.service.TarefaService;
 import dev.wakandaacademy.produdoro.tarefa.domain.Tarefa;
+import dev.wakandaacademy.produdoro.usuario.domain.Usuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -44,11 +45,11 @@ public class TarefaRestController implements TarefaAPI {
     }
 
     @Override
-    public void atualizaOrdemTarefa(String token, UUID idTarefa, NovaOrdemRequest novaOrdem) {
-        log.info("[start] TarefaRestController - atualizaOrdemTarefa");
+    public void alteraPosicaoTarefa(String token, UUID idTarefa, NovaPosicaoRequest novaPosicao) {
+        log.info("[start] TarefaRestController - alteraPosicaoTarefa");
         String emailUsuario = getUsuarioByToken(token);
-        tarefaService.atualizaOrdemTarefa(emailUsuario, idTarefa, novaOrdem);
-        log.debug("[finish] TarefaRestController - atualizaOrdemTarefa");
+        tarefaService.alteraPosicaoTarefa(emailUsuario, idTarefa, novaPosicao);
+        log.info("[finish] TarefaRestController - alteraPosicaoTarefa");
     }
 
     private String getUsuarioByToken(String token) {

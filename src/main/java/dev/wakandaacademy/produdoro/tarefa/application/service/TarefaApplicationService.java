@@ -1,7 +1,7 @@
 package dev.wakandaacademy.produdoro.tarefa.application.service;
 
 import dev.wakandaacademy.produdoro.handler.APIException;
-import dev.wakandaacademy.produdoro.tarefa.application.api.NovaOrdemRequest;
+import dev.wakandaacademy.produdoro.tarefa.application.api.NovaPosicaoRequest;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaIdResponse;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaRequest;
 import dev.wakandaacademy.produdoro.tarefa.application.repository.TarefaRepository;
@@ -13,20 +13,20 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
 @Log4j2
 @RequiredArgsConstructor
 public class TarefaApplicationService implements TarefaService {
-
     private final TarefaRepository tarefaRepository;
     private final UsuarioRepository usuarioRepository;
 
     @Override
     public TarefaIdResponse criaNovaTarefa(TarefaRequest tarefaRequest) {
         log.info("[inicia] TarefaApplicationService - criaNovaTarefa");
-        Tarefa tarefaCriada = tarefaRepository.salva(new Tarefa(tarefaRequest));
+        Tarefa tarefaCriada = tarefaRepository.salva(new Tarefa(tarefaRequest, novaPosicao));
         log.info("[finaliza] TarefaApplicationService - criaNovaTarefa");
         return TarefaIdResponse.builder().idTarefa(tarefaCriada.getIdTarefa()).build();
     }
@@ -55,8 +55,11 @@ public class TarefaApplicationService implements TarefaService {
     }
 
     @Override
-    public void atualizaOrdemTarefa(String emailUsuario, UUID idTarefa, NovaOrdemRequest novaOrdem) {
-        log.info("[start] TarefaApplicationService - atualizaOrdemTarefa");
-        log.debug("[finish] TarefaApplicationService - atualizaOrdemTarefa");
+    public void alteraPosicaoTarefa(String usuario, UUID idTarefa, NovaPosicaoRequest novaPosicao) {
+        log.info("[start] TarefaApplicationService - alteraPosicaoTarefa");
+        Tarefa tarefa = detalhaTarefa(usuario, idTarefa);
+        List<Tarefa> todasTarefas = tarefaRepository.buscaTarefasPorUsuario(tarefa.getIdUsuario());
+        tarefaRepository.novaPosicaoTarefa(tarefa, todasTarefas, novaPosicao);
+        log.info("[finish] TarefaApplicationService - alteraPosicaoTarefa");
     }
 }

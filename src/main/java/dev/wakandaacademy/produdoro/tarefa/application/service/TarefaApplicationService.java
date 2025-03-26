@@ -2,6 +2,7 @@ package dev.wakandaacademy.produdoro.tarefa.application.service;
 
 import dev.wakandaacademy.produdoro.handler.APIException;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaIdResponse;
+import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaListResponse;
 import dev.wakandaacademy.produdoro.tarefa.application.api.TarefaRequest;
 import dev.wakandaacademy.produdoro.tarefa.application.repository.TarefaRepository;
 import dev.wakandaacademy.produdoro.tarefa.domain.Tarefa;
@@ -61,4 +62,65 @@ public class TarefaApplicationService implements TarefaService {
         usuario.pertenceAoUsuario(usuarioPorEmail);
 
     }
+
+    @Override
+    public void incrementaPomodoro(String emailUsuario, UUID idTarefa) {
+        log.info("[inicia] TarefaApplicationService - incrementaPomodoro");
+        Usuario usuario = usuarioRepository.buscaUsuarioPorEmail(emailUsuario);
+        Tarefa tarefa = detalhaTarefa(emailUsuario, idTarefa);
+        tarefa.incrementaPomodoro(tarefa, usuario);
+        usuarioRepository.salva(usuario);
+        tarefaRepository.salva(tarefa);
+        log.info("[finaliza] TarefaApplicationService - incrementaPomodoro");
+
+    }
+
+    @Override
+    public List<TarefaListResponse> buscaTodasTarefas(String usuario, UUID idUsuario) {
+        log.info("[inicia] TarefaApplicationService - buscaTodasTarefas");
+        Usuario usuarioPorEmail = usuarioRepository.buscaUsuarioPorEmail(usuario);
+        usuarioRepository.buscaUsuarioPorId(idUsuario);
+        usuarioPorEmail.validaUsuario(idUsuario);
+        List<Tarefa> tarefas = tarefaRepository.buscaTarefasDoUsuario(idUsuario);
+        log.info("[finaliza] TarefaApplicationService - buscaTodasTarefas");
+        return TarefaListResponse.converte(tarefas);
+    }
+    @Override
+    public void concluiTarefa(String emailUsuario, UUID idTarefa) {
+        log.info("[inicia] TarefaApplicationService - concluiTarefa");
+        Usuario usuario = usuarioRepository.buscaUsuarioPorEmail(emailUsuario);
+        Tarefa tarefa = detalhaTarefa(emailUsuario, idTarefa);
+        tarefa.mudaStatusParaConcluido(usuario);
+        tarefaRepository.salva(tarefa);
+        log.info("[finaliza] TarefaApplicationService - concluiTarefa");
+    }
+
+    @Override
+    public void deletaTodasTarefas(String email, UUID idUsuario) {
+        log.info("[inicia] TarefaApplicationService - deletaTodasTarefas");
+        Usuario usuarioEmail = usuarioRepository.buscaUsuarioPorEmail(email);
+        log.info("[Email] {}", usuarioEmail);
+        usuarioRepository.buscaUsuarioPorId(idUsuario);
+        usuarioEmail.validaUsuario(idUsuario);
+        List<Tarefa> tarefas = tarefaRepository.buscaTarefasDoUsuario(usuarioEmail.getIdUsuario());
+        verificaSeListaEstaVazia(tarefas);
+        verificaQuantidadeTarefas(tarefas);
+        tarefaRepository.deletaTodasTarefasUsuario(tarefas);
+        log.info("[finaliza] TarefaApplicationService - deletaTodasTarefas");
+    }
+
+    private void verificaQuantidadeTarefas(List<Tarefa> tarefas) {
+        if (tarefas.size() < 2) {
+            throw APIException.build(HttpStatus.BAD_REQUEST, "Usuário não possui quantidade " +
+                    "minima de tarefa(as) cadastrada(as)");
+        }
+    }
+
+
+    private void verificaSeListaEstaVazia(List<Tarefa> tarefas) {
+        if (tarefas.isEmpty()) {
+            throw APIException.build(HttpStatus.CONFLICT, "Usuário não possui tarefa(as) cadastrada(as)");
+        }
+    }
+
 }

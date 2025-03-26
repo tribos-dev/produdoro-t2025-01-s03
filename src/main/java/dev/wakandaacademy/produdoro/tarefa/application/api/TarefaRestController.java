@@ -1,5 +1,6 @@
 package dev.wakandaacademy.produdoro.tarefa.application.api;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -45,11 +46,46 @@ public class TarefaRestController implements TarefaAPI {
 
 	}
 
-	private String getUsuarioByToken(String token) {
+	@Override
+	public void incrementaPomodoro(String token, UUID idTarefa) {
+		log.info("[inicia] TarefaRestController - incrementaPomodoro");
+		String emailUsuario = getUsuarioByToken(token);
+		tarefaService.incrementaPomodoro(emailUsuario,idTarefa);
+		log.info("[finaliza] TarefaRestController - incrementaPomodoro");
+
+	}
+
+	@Override
+	public List<TarefaListResponse> listaTodasTarefas(String token, UUID idUsuario) {
+		log.info("[inicia] TarefaRestController - listaTodasTarefas");
+		String usuario = getUsuarioByToken(token);
+		List<TarefaListResponse> tarefas = tarefaService.buscaTodasTarefas(usuario, idUsuario);
+		log.info("[finaliza] TarefaRestController - listaTodasTarefas");
+		return tarefas;
+	}
+
+    @Override
+    public void concluiTarefa(String token, UUID idTarefa) {
+		log.info("[inicia] TarefaRestController - concluiTarefa");
+		String emailUsuario = getUsuarioByToken(token);
+		tarefaService.concluiTarefa(emailUsuario,idTarefa);
+		log.info("[finaliza] TarefaRestController - concluiTarefa");
+    }
+
+    private String getUsuarioByToken(String token) {
 		log.debug("[token] {}", token);
 		String usuario = tokenService.getUsuarioByBearerToken(token).orElseThrow(() -> APIException.build(HttpStatus.UNAUTHORIZED, token));
 		log.info("[usuario] {}", usuario);
 		return usuario;
+    	}
+
+	@Override
+	public void deletaTodasTarefas(String token, UUID idUsuario) {
+		log.info("[inicia] TarefaRestController - deletaTodasTarefas");
+		String usuario = getUsuarioByToken(token);
+		tarefaService.deletaTodasTarefas(usuario, idUsuario);
+		log.info("[finaliza] TarefaRestController - deletaTodasTarefas");
 	}
+
 
 }

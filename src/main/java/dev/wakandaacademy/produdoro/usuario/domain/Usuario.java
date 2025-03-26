@@ -87,14 +87,8 @@ public class Usuario {
     }
 
     public void alteraStatusParaFoco(UUID idUsuario) {
-        validaUsuarioPorId(idUsuario);
+        validaUsuario(idUsuario);
         verificaStatusFoco();
-    }
-
-    public void validaUsuarioPorId(UUID idUsuario) {
-        if (!this.idUsuario.equals(idUsuario)) {
-            throw APIException.build(HttpStatus.UNAUTHORIZED, "Credencial de autenticação não é válida!");
-        }
     }
 
     private void verificaStatusFoco() {
